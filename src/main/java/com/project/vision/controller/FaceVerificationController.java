@@ -1,0 +1,69 @@
+package com.project.vision.controller;
+
+import java.io.IOException;
+
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.project.vision.model.FaceVerificationResponse;
+import com.project.vision.service.FaceService;
+import com.project.vision.service.FaceVerificationException;
+// import com.project.vision.service.FaceVerificationService;
+
+@RestController
+public class FaceVerificationController {
+
+    // private final FaceVerificationService faceVerificationService;
+    @Autowired 
+    private FaceService faceService;
+
+    // public FaceVerificationController(FaceVerificationService faceVerificationService) {
+    //     this.faceVerificationService = faceVerificationService;
+    // }
+
+    @PostMapping("/api/verify-face")
+    public ResponseEntity<FaceVerificationResponse> verifyFace(@RequestParam(value = "image", required = false) MultipartFile image) throws IOException {
+
+        System.out.println("in controller");
+        byte[] bytes = image.getBytes();
+
+        Mat img = Imgcodecs.imdecode(
+                    new MatOfByte(bytes),
+                    Imgcodecs.IMREAD_COLOR
+            );
+        
+        // FaceVerificationResponse response = faceVerificationService.verify(image);
+        FaceVerificationResponse refImageRes = faceService.detectFace(img);
+        if (!refImageRes.isVerified()) {
+            System.out.println(refImageRes.getMessage());
+            return ResponseEntity.badRequest().body(refImageRes);
+        }
+        Mat refImage = faceService.loadReferenceImage();
+        FaceVerificationResponse ogImageRes = faceService.detectFace(refImage);
+        if (!ogImageRes.isVerified()) {
+            System.out.println(ogImageRes.getMessage());
+            return ResponseEntity.badRequest().body(ogImageRes);
+        }
+
+        
+        Mat refFace = refImageRes.getFaces(), ogFace = ogImageRes.getFaces();
+
+        FaceVerificationResponse comparison = faceService.compareFace(refImage,ogFace,img, refFace);
+        // System.out.println(response.getSimilarity());
+        return ResponseEntity.ok(comparison);
+    }
+
+    @ExceptionHandler(FaceVerificationException.class)
+    public ResponseEntity<FaceVerificationResponse> handleFaceVerificationException(FaceVerificationException ex) {
+        return ResponseEntity.status(ex.getStatus())
+                .body(new FaceVerificationResponse(false, ex.getMessage(), null, false));
+    }
+}
