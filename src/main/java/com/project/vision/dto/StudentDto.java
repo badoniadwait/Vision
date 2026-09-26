@@ -7,6 +7,8 @@ public class StudentDto {
     private String name;
     private String password;
     private MultipartFile referencePhotoPath;
+    // private String adminId;
+
 
     public MultipartFile getReferencePhotoPath() {
         return referencePhotoPath;
