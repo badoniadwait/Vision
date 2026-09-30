@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
 
 import com.project.vision.entity.Admin;
 import com.project.vision.repo.AdminRepo;
@@ -22,6 +23,17 @@ public class AdminController {
     public AdminController(AdminRepo adminRepo, PasswordEncoder passwordEncoder) {
         this.adminRepo = adminRepo;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    @GetMapping("/admin/profile")
+    public String adminProfile(Authentication authentication, Model model) {
+        if (!isAuthenticated(authentication)) {
+            return "redirect:/admin/login";
+        }
+        Admin admin = adminRepo.findByEmailIgnoreCase(authentication.getName()).orElse(null);
+        if (admin == null) return "redirect:/admin/login";
+        model.addAttribute("admin", admin);
+        return "adminProfile";
     }
 
     @GetMapping("/admin/login")
@@ -63,6 +75,7 @@ public class AdminController {
         admin.setEmail(normalizedEmail);
         admin.setSubject(normalizedSubject);
         admin.setPassword(passwordEncoder.encode(password));
+        admin.setIsVerified(false);
         adminRepo.save(admin);
 
         return "redirect:/admin/login?registered";

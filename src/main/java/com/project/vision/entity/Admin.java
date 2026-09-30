@@ -14,6 +14,7 @@ public class Admin {
     private String email;
     private String subject;
     private String password;
+    private Boolean isVerified = false;
 
     public Admin() {
     }
@@ -25,6 +26,15 @@ public class Admin {
     public void setId(String id) {
         this.id = id;
     }
+
+    public Boolean getIsVerified() {
+        return isVerified;
+    }
+
+    public void setIsVerified(Boolean isVerified) {
+        this.isVerified = isVerified;
+    }
+
 
     public String getSubject() {
         return subject;

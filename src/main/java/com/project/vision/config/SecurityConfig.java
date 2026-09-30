@@ -15,6 +15,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 
@@ -39,6 +41,11 @@ public class SecurityConfig {
     }
 
     @Bean
+    public AuthenticationFailureHandler oauth2FailureHandler() {
+        return new SimpleUrlAuthenticationFailureHandler("/admin/signup?oauthError");
+    }
+
+    @Bean
     public CommandLineRunner seedAdmin(AdminRepo adminRepo, PasswordEncoder encoder) {
         return args -> {
             if (adminRepo.findByEmail(username).isEmpty() && adminRepo.findByName(username).isEmpty()) {
@@ -47,6 +54,7 @@ public class SecurityConfig {
                 admin.setName(username);
                 admin.setEmail(username);
                 admin.setPassword(encoder.encode(password));
+                admin.setIsVerified(false);
                 adminRepo.save(admin);
             }
         };
@@ -78,11 +86,15 @@ public class SecurityConfig {
 
     @Bean
     @Order(2)
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            com.project.vision.security.GitHubOAuth2SuccessHandler successHandler,
+            AuthenticationFailureHandler oauth2FailureHandler,
+            com.project.vision.service.GitHubOAuth2UserService githubUserService) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/error", "/api/verify-face", "/student-login", "/admin/login", "/admin/signup", "/admin/register", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/error", "/api/verify-face", "/student-login", "/admin/login", "/admin/signup", "/admin/register", "/admin/verify-email/confirm", "/github/register", "/oauth2/authorization/**", "/login/oauth2/code/**", "/css/**", "/js/**", "/images/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(basic -> {
@@ -94,7 +106,11 @@ public class SecurityConfig {
                         .passwordParameter("password")
                         .defaultSuccessUrl("/", true)
                         .failureUrl("/admin/login?error")
-                        .permitAll());
+                        .permitAll())
+                .oauth2Login(oauth -> oauth
+                        .userInfoEndpoint(userInfo -> userInfo.userService(githubUserService))
+                        .successHandler(successHandler)
+                        .failureHandler(oauth2FailureHandler));
         return http.build();
     }
 }

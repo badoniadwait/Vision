@@ -1,11 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>admin signup</title>
 </head>
 <body>
+<p th:if="${param.githubEmailConflict}">An account with this email already exists. Please log in using your existing account.</p>
+<p th:if="${param.oauthError}">GitHub sign-in failed. Please try again.</p>
+<script th:if="${param.githubEmailConflict}">
+    alert('An account with this email already exists. Please log in using your existing account.');
+</script>
     <form action="/admin/register" method="post">
     <input type="text" name="name" placeholder="Name" required>
     <input type="email" name="email" placeholder="Email" required>
@@ -14,5 +19,7 @@
     <button type="submit">Sign Up</button>
 </form>
 <p><a href="/admin/login">have an account?</a></p>
+
+<p><a href="/oauth2/authorization/github">Sign Up using GitHub</a></p>
 </body>
 </html>

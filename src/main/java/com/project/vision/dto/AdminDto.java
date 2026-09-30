@@ -7,6 +7,15 @@ public class AdminDto {
     private String email;
     private String password;
     private String subject;
+    private Boolean isVerified;
+
+    public Boolean getIsVerified() {
+        return isVerified;
+    }
+
+    public void setIsVerified(Boolean isVerified) {
+        this.isVerified = isVerified;
+    }
 
     public String getId() {
         return id;

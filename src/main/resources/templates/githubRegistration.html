@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Complete admin signup</title></head>
+<body>
+    <h1>Complete admin signup</h1>
+    <p th:if="${param.error}">Enter your name and subject to continue.</p>
+    <form action="/github/register" method="post">
+        <label>Name <input type="text" name="name" th:value="${suggestedName}" required></label>
+        <label>Email <input type="email" th:value="${githubEmail}" readonly></label>
+        <label>Subject <input type="text" name="subject" required></label>
+        <button type="submit">Complete signup</button>
+    </form>
+</body>
+</html>

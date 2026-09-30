@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Admin Profile</title>
+</head>
+<body>
+    <h1 th:text="${admin.name}">Admin Profile</h1>
+    <script th:if="${param.verificationRequired}">
+        alert("Verify your email before registering a student.");
+    </script>
+    <div>
+        <p>Name: <span th:text="${admin.name}">Admin name</span></p>
+        <p>Email: <span th:text="${admin.email}">admin@example.com</span></p>
+        <p th:if="${admin.isVerified}">Email verified</p>
+        <div th:unless="${admin.isVerified}">
+            <p>Email not verified</p>
+            <form method="post" action="/admin/verify-email">
+                <button type="submit">Verify Email</button>
+            </form>
+        </div>
+        <p th:if="${param.verificationEmailSent}">Verification email sent. Check your inbox.</p>
+        <script th:if="${param.verificationError}">
+            alert("Could not send verification email.");
+        </script>
+
+    </div>
+
+    <div>
+        <a href="/upload-quiz">Upload Quiz</a>
+    </div>
+
+    <div>
+         <a href="/logout">Logout</a>
+    </div>
+</body>
+</html>
