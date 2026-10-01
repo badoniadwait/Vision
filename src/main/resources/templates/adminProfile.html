@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>Admin Profile</title>
+    <title>Admin Profile</title>
 </head>
+
 <body>
     <h1 th:text="${admin.name}">Admin Profile</h1>
     <script th:if="${param.verificationRequired}">
@@ -29,10 +31,13 @@
 
     <div>
         <a href="/upload-quiz">Upload Quiz</a>
+        <p><a href="/register-student">Register Student</a></p>
+
     </div>
 
     <div>
-         <a href="/logout">Logout</a>
+        <a href="/logout">Logout</a>
     </div>
 </body>
+
 </html>
