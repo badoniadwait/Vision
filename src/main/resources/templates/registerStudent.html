@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Student</title>
+</head>
+<body>
+
+    <h1>Register Student</h1>
+
+    <form id="registerForm"
+          action="/register-student"
+          method="post"
+          enctype="multipart/form-data">
+
+        <input type="text" name="sapId"
+               placeholder="SAP ID" required>
+        <br><br>
+
+        <input type="text" name="name"
+               placeholder="Name" required>
+        <br><br>
+
+        <h3>Capture Student Photo</h3>
+
+        <video id="camera" width="320" autoplay playsinline
+               style="display:none;"></video>
+
+        <br>
+
+        <button type="button" id="openCamera">
+            Open Camera
+        </button>
+
+        <button type="button" id="capturePhoto" disabled>
+            Capture Photo
+        </button>
+
+        <br><br>
+
+        <canvas id="canvas" width="320" hidden></canvas>
+
+        <img id="preview" width="200"
+             alt="Captured photo preview"
+             style="display:none;">
+
+        <input type="file"
+               id="studentPhoto"
+               name="referencePhotoPath"
+               accept="image/*"
+               hidden>
+
+        <br><br>
+
+        <input type="password" name="password"
+               placeholder="Password" required>
+        <br><br>
+
+        <button type="submit">Register</button>
+
+    </form>
+
+    <script>
+        const video = document.getElementById("camera");
+        const canvas = document.getElementById("canvas");
+        const preview = document.getElementById("preview");
+        const photoInput = document.getElementById("studentPhoto");
+        const openButton = document.getElementById("openCamera");
+        const captureButton = document.getElementById("capturePhoto");
+        const form = document.getElementById("registerForm");
+
+        let stream = null;
+
+        openButton.addEventListener("click", async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "environment" },
+                    audio: false
+                });
+
+                video.srcObject = stream;
+                video.style.display = "block";
+                captureButton.disabled = false;
+                preview.style.display = "none";
+                photoInput.value = "";
+            } catch (error) {
+                alert("Cannot access camera. Please allow camera permission.");
+                console.error(error);
+            }
+        });
+
+        captureButton.addEventListener("click", () => {
+            if (!video.videoWidth) {
+                alert("Camera is not ready yet.");
+                return;
+            }
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            const context = canvas.getContext("2d");
+            context.drawImage(video, 0, 0);
+
+            canvas.toBlob((blob) => {
+                if (!blob) {
+                    alert("Failed to capture photo.");
+                    return;
+                }
+
+                const file = new File(
+                    [blob],
+                    "student-photo.jpg",
+                    { type: "image/jpeg" }
+                );
+
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                photoInput.files = dataTransfer.files;
+
+                preview.src = URL.createObjectURL(blob);
+                preview.style.display = "block";
+
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+
+                video.style.display = "none";
+                captureButton.disabled = true;
+                openButton.textContent = "Retake Photo";
+            }, "image/jpeg", 0.9);
+        });
+
+        // Ensure a photo has been captured
+        form.addEventListener("submit", (event) => {
+            if (!photoInput.files.length) {
+                event.preventDefault();
+                alert("Please capture a student photo first.");
+            }
+        });
+    </script>
+
+</body>
+</html>

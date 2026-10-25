@@ -2,9 +2,10 @@ package com.project.vision.controller;
 
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,40 +16,60 @@ import com.project.vision.repo.AdminRepo;
 @Controller
 public class AdminController {
 
-    @Autowired
-    private AdminRepo adminRepo;
+    private final AdminRepo adminRepo;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public AdminController(AdminRepo adminRepo, PasswordEncoder passwordEncoder) {
+        this.adminRepo = adminRepo;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @GetMapping("/admin/login")
-    public String adminLogin() {
-        return "adminLogin";
+    public String adminLogin(Authentication authentication) {
+        return isAuthenticated(authentication) ? "redirect:/" : "adminLogin";
     }
 
     @GetMapping("/admin/signup")
-    public String adminSignup() {
-        return "adminSignup";
+    public String adminSignup(Authentication authentication) {
+        return isAuthenticated(authentication) ? "redirect:/" : "adminSignup";
     }
 
-    @PostMapping("/admin/signup")
-    public String adminSignup(@RequestParam(required = false) String username,
-                              @RequestParam(required = false) String name,
-                              @RequestParam String email,
-                              @RequestParam String subject,
-                              @RequestParam String password) {
+    @PostMapping("/admin/register")
+    public String adminRegister(
+            @RequestParam String name,
+            @RequestParam String email,
+            @RequestParam String subject,
+            @RequestParam String password,
+            Authentication authentication) {
+        if (isAuthenticated(authentication)) {
+            return "redirect:/";
+        }
+
+        String normalizedName = name.trim();
+        String normalizedEmail = email.trim();
+        String normalizedSubject = subject.trim();
+        if (!StringUtils.hasText(normalizedName)
+                || !StringUtils.hasText(normalizedEmail)
+                || !StringUtils.hasText(normalizedSubject)
+                || !StringUtils.hasText(password)
+                || adminRepo.findByEmail(normalizedEmail).isPresent()
+                || adminRepo.findByName(normalizedName).isPresent()) {
+            return "redirect:/admin/signup?error";
+        }
+
         Admin admin = new Admin();
         admin.setId(UUID.randomUUID().toString());
-
-        String resolvedName = (name != null && !name.isBlank()) ? name : username;
-        if (resolvedName == null || resolvedName.isBlank()) {
-            resolvedName = email;
-        }
-        admin.setName(resolvedName);
-        admin.setSubject(subject);
-        admin.setEmail(email);
+        admin.setName(normalizedName);
+        admin.setEmail(normalizedEmail);
+        admin.setSubject(normalizedSubject);
         admin.setPassword(passwordEncoder.encode(password));
         adminRepo.save(admin);
-        return "redirect:/admin/login";
+
+        return "redirect:/admin/login?registered";
+    }
+
+    private boolean isAuthenticated(Authentication authentication) {
+        return authentication != null && authentication.isAuthenticated()
+                && !"anonymousUser".equals(authentication.getPrincipal());
     }
 }

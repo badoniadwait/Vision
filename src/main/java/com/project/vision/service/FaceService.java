@@ -2,8 +2,13 @@ package com.project.vision.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
 import org.opencv.core.Size;
 import org.opencv.dnn.Dnn;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -19,8 +24,6 @@ import com.project.vision.model.FaceVerificationResponse;
 
 public class FaceService {
 
-    @Value("${face.reference-image:reference-images/student.jpg}")
-    private String referenceImagePath;
     @Value("${face.sface-model:models/face_recognition_sface_2021dec.onnx}")
     private String sfaceModelPath;
     @Value("${face.yunet-model:models/face_detection_yunet_2023mar.onnx}")
@@ -107,20 +110,37 @@ public class FaceService {
         return res;
     }
 
-    public Mat loadReferenceImage() {
+    public Mat loadReferenceImage(String imageUrl) throws Exception {
 
-        File referenceFile = new File(referenceImagePath).getAbsoluteFile();
-        if (!referenceFile.isFile()) {
-            throw new FaceVerificationException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Reference image not found: " + referenceFile);
+        System.out.println(imageUrl);
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(imageUrl))
+                .GET()
+                .build();
+
+        HttpResponse<byte[]> response = client.send(
+                request,
+                HttpResponse.BodyHandlers.ofByteArray()
+        );
+
+        if (response.statusCode() != 200) {
+            throw new RuntimeException("Failed to fetch image");
         }
 
-        Mat referenceImage = Imgcodecs.imread(referenceFile.getAbsolutePath(), Imgcodecs.IMREAD_COLOR);
-        if (referenceImage.empty()) {
-            throw new FaceVerificationException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Reference image could not be decoded: " + referenceFile);
+        MatOfByte imageBytes = new MatOfByte(response.body());
+
+        try {
+            return Imgcodecs.imdecode(
+                    imageBytes,
+                    Imgcodecs.IMREAD_COLOR
+            );
+        } finally {
+            imageBytes.release();
         }
-        return referenceImage;
+
     }
 
     private FaceDetectorYN getDetector() {
