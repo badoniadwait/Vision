@@ -4,63 +4,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register Student</title>
+    <title>Vision | Register Student</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 
-    <h1>Register Student</h1>
+    <main class="register-page">
 
-    <form id="registerForm"
-          action="/register-student"
-          method="post"
-          enctype="multipart/form-data">
+        <section class="register-container">
 
-        <input type="text" name="sapId"
-               placeholder="SAP ID" required>
-        <br><br>
+            <header class="register-header">
+                <h1>Register Student</h1>
+            </header>
 
-        <input type="text" name="name"
-               placeholder="Name" required>
-        <br><br>
+            <div class="register-content">
 
-        <h3>Capture Student Photo</h3>
+                <form id="registerForm"
+                      action="/register-student"
+                      method="post"
+                      enctype="multipart/form-data"
+                      class="register-form">
 
-        <video id="camera" width="320" autoplay playsinline
-               style="display:none;"></video>
+                    <div class="form-group">
+                        <label for="sapId">SAP ID</label>
+                        <input
+                            type="text"
+                            id="sapId"
+                            name="sapId"
+                            placeholder="SAP ID"
+                            required
+                        >
+                    </div>
 
-        <br>
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            placeholder="Name"
+                            required
+                        >
+                    </div>
 
-        <button type="button" id="openCamera">
-            Open Camera
-        </button>
+                    <section class="photo-section">
 
-        <button type="button" id="capturePhoto" disabled>
-            Capture Photo
-        </button>
+                        <header class="section-header">
+                            <h2>Capture Student Photo</h2>
+                        </header>
 
-        <br><br>
+                        <div class="camera-container">
+                            <video
+                                id="camera"
+                                width="320"
+                                autoplay
+                                playsinline
+                                style="display:none;"
+                            ></video>
 
-        <canvas id="canvas" width="320" hidden></canvas>
+                            <canvas
+                                id="canvas"
+                                width="320"
+                                hidden
+                            ></canvas>
 
-        <img id="preview" width="200"
-             alt="Captured photo preview"
-             style="display:none;">
+                            <img
+                                id="preview"
+                                width="200"
+                                alt="Captured photo preview"
+                                style="display:none;"
+                            >
+                        </div>
 
-        <input type="file"
-               id="studentPhoto"
-               name="referencePhotoPath"
-               accept="image/*"
-               hidden>
+                        <div class="camera-actions">
+                            <button type="button" id="openCamera">
+                                Open Camera
+                            </button>
 
-        <br><br>
+                            <button
+                                type="button"
+                                id="capturePhoto"
+                                disabled
+                            >
+                                Capture Photo
+                            </button>
+                        </div>
 
-        <input type="password" name="password"
-               placeholder="Password" required>
-        <br><br>
+                        <input
+                            type="file"
+                            id="studentPhoto"
+                            name="referencePhotoPath"
+                            accept="image/*"
+                            hidden
+                        >
 
-        <button type="submit">Register</button>
+                    </section>
 
-    </form>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Password"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="register-submit">
+                            Register
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+    </main>
 
     <script>
         const video = document.getElementById("camera");

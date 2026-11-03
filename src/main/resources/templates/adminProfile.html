@@ -1,43 +1,138 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Profile</title>
+    <title>Vision | Admin Profile</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
-    <h1 th:text="${admin.name}">Admin Profile</h1>
-    <script th:if="${param.verificationRequired}">
-        alert("Verify your email before registering a student.");
-    </script>
-    <div>
-        <p>Name: <span th:text="${admin.name}">Admin name</span></p>
-        <p>Email: <span th:text="${admin.email}">admin@example.com</span></p>
-        <p th:if="${admin.isVerified}">Email verified</p>
-        <div th:unless="${admin.isVerified}">
-            <p>Email not verified</p>
-            <form method="post" action="/admin/verify-email">
-                <button type="submit">Verify Email</button>
-            </form>
-        </div>
-        <p th:if="${param.verificationEmailSent}">Verification email sent. Check your inbox.</p>
-        <script th:if="${param.verificationError}">
-            alert("Could not send verification email.");
+
+    <!-- Main Profile Page -->
+    <main class="profile-page">
+
+        <!-- Profile Header -->
+        <header class="page-header">
+
+            <h1 th:text="${admin.name}">Admin Profile</h1>
+
+        </header>
+
+
+        <!-- Verification Required Alert -->
+        <script th:if="${param.verificationRequired}">
+            alert("Verify your email before registering a student.");
         </script>
 
-    </div>
 
-    <div>
-        <a href="/upload-quiz">Upload Quiz</a>
-        <p><a href="/register-student">Register Student</a></p>
+        <!-- Admin Information -->
+        <section class="profile-section">
 
-    </div>
+            <div class="profile-card">
 
-    <div>
-        <a href="/logout">Logout</a>
-    </div>
+                <header class="profile-card-header">
+                    <h2>Personal Information</h2>
+                </header>
+
+                <div class="profile-details">
+
+                    <div class="profile-detail">
+                        <p>Name</p>
+                        <span th:text="${admin.name}">Admin name</span>
+                    </div>
+
+                    <div class="profile-detail">
+                        <p>Email</p>
+                        <span th:text="${admin.email}">admin@example.com</span>
+                    </div>
+
+                </div>
+
+
+                <!-- Email Verification Status -->
+                <div class="verification-section">
+
+                    <!-- Verified -->
+                    <div
+                        class="verification-status"
+                        th:if="${admin.isVerified}">
+
+                        <p>Email verified</p>
+
+                    </div>
+
+
+                    <!-- Not Verified -->
+                    <div
+                        class="verification-status"
+                        th:unless="${admin.isVerified}">
+
+                        <p>Email not verified</p>
+
+                        <form
+                            method="post"
+                            action="/admin/verify-email"
+                            class="verification-form">
+
+                            <button type="submit">
+                                Verify Email
+                            </button>
+
+                        </form>
+
+                    </div>
+
+
+                    <!-- Verification Success Message -->
+                    <p
+                        class="verification-message"
+                        th:if="${param.verificationEmailSent}">
+                        Verification email sent. Check your inbox.
+                    </p>
+
+
+                    <!-- Verification Error Alert -->
+                    <script th:if="${param.verificationError}">
+                        alert("Could not send verification email.");
+                    </script>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Profile Navigation -->
+        <section class="profile-navigation">
+
+            <h2>Account Actions</h2>
+
+            <nav class="profile-actions">
+
+                <a href="/register-student">
+                    Register Student
+                </a>
+
+            </nav>
+
+        </section>
+
+        <br>
+
+        <!-- Account Session -->
+        <footer class="profile-actions">
+
+            <a style="color: red; background-color: white;" href="/logout">
+                Logout
+            </a>
+
+        </footer>
+
+    </main>
+
 </body>
-
 </html>

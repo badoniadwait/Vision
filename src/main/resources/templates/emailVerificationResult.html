@@ -1,15 +1,49 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Verification</title>
+    <title>Vision | Email Verification</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
+
 <body>
-    <h1 th:if="${verified}">Email verified</h1>
-    <p th:if="${verified}">Your Vision admin email has been verified.</p>
-    <h1 th:unless="${verified}">Verification link invalid or expired</h1>
-    <p th:unless="${verified}">Request a new verification email from your profile.</p>
-    <a href="/admin/profile">Return to profile</a>
+
+    <main class="verification-page">
+
+        <section class="verification-container">
+
+            <header class="verification-header">
+                <h1 class="verification-title" th:if="${verified}">
+                    Email verified
+                </h1>
+
+                <h1 class="verification-title" th:unless="${verified}">
+                    Verification link invalid or expired
+                </h1>
+            </header>
+
+            <div class="verification-content">
+                <p class="verification-message" th:if="${verified}">
+                    Your Vision admin email has been verified.
+                </p>
+
+                <p class="verification-message" th:unless="${verified}">
+                    Request a new verification email from your profile.
+                </p>
+
+                <nav class="verification-navigation">
+                    <a class="profile-link" href="/admin/profile">
+                        Return to profile
+                    </a>
+                </nav>
+            </div>
+
+        </section>
+
+    </main>
+
 </body>
+
 </html>

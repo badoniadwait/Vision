@@ -1,14 +1,76 @@
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="UTF-8"><title>Complete admin signup</title></head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vision | Complete Admin Signup</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
 <body>
-    <h1>Complete admin signup</h1>
-    <p th:if="${param.error}">Enter your name and subject to continue.</p>
-    <form action="/github/register" method="post">
-        <label>Name <input type="text" name="name" th:value="${suggestedName}" required></label>
-        <label>Email <input type="email" th:value="${githubEmail}" readonly></label>
-        <label>Subject <input type="text" name="subject" required></label>
-        <button type="submit">Complete signup</button>
-    </form>
+
+    <main class="auth-page">
+
+        <section class="auth-container">
+
+            <header class="auth-header">
+                <h1 class="auth-title">Complete admin signup</h1>
+            </header>
+
+            <div class="auth-content">
+
+                <div class="auth-messages">
+                    <p class="error-message" th:if="${param.error}">
+                        Enter your name and subject to continue.
+                    </p>
+                </div>
+
+                <form action="/github/register" method="post" class="auth-form">
+
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            th:value="${suggestedName}"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            th:value="${githubEmail}"
+                            readonly
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input
+                            type="text"
+                            id="subject"
+                            name="subject"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="auth-submit">
+                            Complete signup
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+    </main>
+
 </body>
 </html>
