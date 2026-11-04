@@ -38,10 +38,15 @@ public class StudentJwtService {
     }
 
     public String generateToken(String sapId) {
+        return generateToken(sapId, "STUDENT");
+    }
+
+    public String generateToken(String subject, String role) {
         Date issuedAt = new Date();
         Date expiresAt = new Date(issuedAt.getTime() + expirationMs);
         return Jwts.builder()
-                .subject(sapId)
+                .subject(subject)
+                .claim("role", role)
                 .issuedAt(issuedAt)
                 .expiration(expiresAt)
                 .signWith(signingKey)
@@ -58,5 +63,17 @@ public class StudentJwtService {
             throw new IllegalArgumentException("JWT is missing required claims.");
         }
         return claims.getSubject();
+    }
+
+    public String extractRole(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(signingKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        Object role = claims.get("role");
+        return role instanceof String && StringUtils.hasText((String) role)
+                ? (String) role
+                : "STUDENT";
     }
 }
