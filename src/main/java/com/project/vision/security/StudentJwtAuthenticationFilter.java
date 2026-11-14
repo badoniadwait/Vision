@@ -32,10 +32,11 @@ public class StudentJwtAuthenticationFilter extends OncePerRequestFilter {
         if (authorization != null && authorization.startsWith("Bearer ")) {
             String token = authorization.substring(7).trim();
             try {
-                String sapId = jwtService.extractSapId(token);
+                String subject = jwtService.extractSapId(token);
+                String role = jwtService.extractRole(token);
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
-                                sapId, null, List.of(new SimpleGrantedAuthority("ROLE_STUDENT")));
+                                subject, null, List.of(new SimpleGrantedAuthority("ROLE_" + role)));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (JwtException | IllegalArgumentException ex) {
                 SecurityContextHolder.clearContext();

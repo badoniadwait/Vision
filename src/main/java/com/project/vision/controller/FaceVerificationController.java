@@ -33,6 +33,12 @@ public class FaceVerificationController {
     @PostMapping("/api/verify-face")
     public ResponseEntity<FaceVerificationResponse> verifyFace(@ModelAttribute FaceVerificationRequest req) throws IOException, Exception {
 
+        System.out.println("========== FACE VERIFICATION REQUEST ==========");
+        System.out.println("Image received: " + (req.getImage() != null));
+        System.out.println("Image size: "
+                + (req.getImage() != null ? req.getImage().getSize() : 0));
+        System.out.println("Image URL: " + req.getImgUrl());
+
         MultipartFile image = req.getImage();
 
         byte[] bytes = image.getBytes();
@@ -53,11 +59,10 @@ public class FaceVerificationController {
 
         Mat refImage = faceService.loadReferenceImage(req.getImgUrl());
 
-        Imgcodecs.imwrite("scanned_image.jpg", img);
-        System.out.println("scanned_image.jpg created");
-        Imgcodecs.imwrite("supabase_image.jpg", refImage);
-        System.out.println("supabase_image.jpg created");
-
+        // Imgcodecs.imwrite("scanned_image.jpg", img);
+        // System.out.println("scanned_image.jpg created");
+        // Imgcodecs.imwrite("supabase_image.jpg", refImage);
+        // System.out.println("supabase_image.jpg created");
         FaceVerificationResponse ogImageRes = faceService.detectFace(refImage);
         if (!ogImageRes.isVerified()) {
             System.out.println(ogImageRes.getMessage());
