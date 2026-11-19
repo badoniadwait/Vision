@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project.vision.entity.Quiz;
 import com.project.vision.entity.Student;
-import com.project.vision.entity.ExamAttempt;
-import com.project.vision.repo.ExamAttemptRepo;
 import com.project.vision.repo.QuizRepository;
 import com.project.vision.repo.StudentRepo;
 
@@ -28,12 +26,10 @@ public class StudentMobileController {
 
     private final StudentRepo studentRepo;
     private final QuizRepository quizRepository;
-    private final ExamAttemptRepo attemptRepo;
 
-    public StudentMobileController(StudentRepo studentRepo, QuizRepository quizRepository, ExamAttemptRepo attemptRepo) {
+    public StudentMobileController(StudentRepo studentRepo, QuizRepository quizRepository) {
         this.studentRepo = studentRepo;
         this.quizRepository = quizRepository;
-        this.attemptRepo = attemptRepo;
     }
 
     @GetMapping("/profile")
@@ -89,50 +85,6 @@ public class StudentMobileController {
                         List.of(question.getOptionA(), question.getOptionB(), question.getOptionC(), question.getOptionD())))
                 .toList();
         return ResponseEntity.ok(new QuizDetails(quiz.getId(), quiz.getDurationMinutes(), quiz.getExpiresAt(), questions));
-    }
-
-    @GetMapping("/history")
-    public ResponseEntity<?> history(Authentication authentication) {
-        if (!isStudent(authentication)) return unauthorized();
-        List<AttemptResult> history = attemptRepo.findByStudentSapIdOrderBySubmittedAtDesc(authentication.getName())
-                .stream()
-                .map(attempt -> new AttemptResult(
-                        attempt.getId(), attempt.getQuiz().getId(), attempt.getScore(), attempt.getTotal(),
-                        attempt.getTotal() == 0 ? 0 : Math.round(attempt.getScore() * 100f / attempt.getTotal()),
-                        attempt.getSubmittedAt()))
-                .toList();
-        return ResponseEntity.ok(history);
-    }
-
-    @PostMapping("/quizzes/{id}/submit")
-    public ResponseEntity<?> submit(
-            @PathVariable Long id,
-            @RequestBody SubmitRequest request,
-            Authentication authentication) {
-        if (!isStudent(authentication)) return unauthorized();
-
-        Student student = studentRepo.findById(authentication.getName()).orElse(null);
-        Quiz quiz = quizRepository.findWithQuestionsById(id).orElse(null);
-        if (student == null || student.getAdminId() == null || quiz == null
-                || quiz.getAdmin() == null || !student.getAdminId().equals(quiz.getAdmin().getId())) {
-            return ResponseEntity.notFound().build();
-        }
-        if (!quiz.getExpiresAt().isAfter(Instant.now())) {
-            return ResponseEntity.badRequest().body(Map.of("message", "This exam has expired."));
-        }
-
-        Map<Long, Integer> answers = request == null || request.answers() == null ? Map.of() : request.answers();
-        int score = (int) quiz.getQuestions().stream()
-                .filter(question -> question.getAnswer().equals(answers.get(question.getId())))
-                .count();
-        int total = quiz.getQuestions().size();
-        ExamAttempt attempt = new ExamAttempt();
-        attempt.setStudent(student);
-        attempt.setQuiz(quiz);
-        attempt.setScore(score);
-        attempt.setTotal(total);
-        attemptRepo.save(attempt);
-        return ResponseEntity.ok(new ExamResult(attempt.getId(), score, total, total == 0 ? 0 : Math.round(score * 100f / total)));
     }
 
     private boolean isStudent(Authentication authentication) {

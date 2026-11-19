@@ -1,5 +1,6 @@
 package com.project.vision.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import com.project.vision.dto.QuizDto;
@@ -76,10 +77,30 @@ public class QuizController {
 
     @PostMapping("/api/quiz/submit")
     @ResponseBody
-    public QuizResultsDto submitQuiz(@RequestHeader("id") String id, @RequestBody Map<String, String> answers) {
+    public QuizResultsDto submitQuiz(@RequestHeader("id") String id, @RequestBody Map<String, String> answers,
+            Authentication authentication) {
 
+
+        // upload quiz to database
         System.out.println("Fetching quiz with ID: " + id);
 
-        return quizService.validateAnswers(id, answers);
+        return quizService.validateAnswers(id, authentication.getName(), answers);
     }
+
+
+    @PostMapping("/api/quiz-results")
+    @ResponseBody
+    public List<QuizResultsDto> fetchStudentQuizzesResults(Authentication authentication) {
+
+        return quizService.getQuizResultsForStudent(authentication.getName());
+    }
+
+    @PostMapping("/api/quiz-result")
+    @ResponseBody
+    public QuizResultsDto fetchStudentQuizResult(Authentication authentication) {
+
+        return quizService.getQuizResultsForStudent(authentication.getName()).stream().findFirst().orElse(null);
+    }
+
+
 }

@@ -17,8 +17,11 @@ import com.project.vision.dto.QuizResultsDto;
 import com.project.vision.entity.Admin;
 import com.project.vision.entity.Question;
 import com.project.vision.entity.Quiz;
+import com.project.vision.entity.QuizResults;
 import com.project.vision.repo.AdminRepo;
 import com.project.vision.repo.QuizRepository;
+import com.project.vision.repo.QuizResultsRepository;
+import com.project.vision.repo.StudentRepo;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -27,11 +30,16 @@ public class QuizService {
 
     private final QuizRepository quizRepository;
     private final AdminRepo adminRepo;
+    private final StudentRepo studentRepo;
+    private final QuizResultsRepository quizResultsRepository;
     int size = 2;
 
-    public QuizService(QuizRepository quizRepository, AdminRepo adminRepo) {
+    public QuizService(QuizRepository quizRepository, AdminRepo adminRepo, StudentRepo studentRepo,
+            QuizResultsRepository quizResultsRepository) {
         this.quizRepository = quizRepository;
         this.adminRepo = adminRepo;
+        this.studentRepo = studentRepo;
+        this.quizResultsRepository = quizResultsRepository;
     }
 
     @Transactional
@@ -145,37 +153,48 @@ public class QuizService {
 
         return quizDto;
     }
-    
-    public QuizResultsDto validateAnswers(String id, Map<String, String> answers) {
-        
+
+    @Transactional
+    public QuizResultsDto validateAnswers(String id, String studentSapId, Map<String, String> answers) {
         QuizDto quiz = getQuizById(id);
         List<QuizQuestionDto> questions = quiz.getQuestions();
-        int ans[] = new int[answers.size()];
-        int ind = 0;
-        
-        for(Map.Entry<String, String> entry : answers.entrySet()) {
-            String answer = entry.getValue();
-            int indx = questions.get(ind).getOptions().indexOf(answer);
-            ans[ind++] = indx;
-        }
-
-
+        studentRepo.findById(studentSapId)
+                .orElseThrow(() -> new EntityNotFoundException("Authenticated student was not found."));
         int score = 0;
-        int total = 0;
-
-
-        for(int i = 0;i< questions.size();i++) {
+        for (int i = 0; i < questions.size(); i++) {
             QuizQuestionDto question = questions.get(i);
-            total++;
-            int originalAnswer = Integer.parseInt(question.getAnswer());
-            int myAnswer = ans[i];
-
-            if(originalAnswer == myAnswer) {
+            String submittedAnswer = answers == null ? null : answers.get(String.valueOf(i + 1));
+            int correctAnswer;
+            try {
+                correctAnswer = Integer.parseInt(question.getAnswer());
+            } catch (NumberFormatException exception) {
+                continue;
+            }
+            List<String> options = question.getOptions();
+            if (submittedAnswer != null && options != null
+                    && correctAnswer >= 0 && correctAnswer < options.size()
+                    && correctAnswer < 4 && submittedAnswer.equals(options.get(correctAnswer))) {
                 score++;
             }
         }
 
+        QuizResults result = new QuizResults();
+        result.setQuizId(id);
+        result.setStudentId(studentSapId);
+        result.setMarksObtained(score);
+        result.setTotalMarks(questions.size());
+        quizResultsRepository.save(result);
+        return new QuizResultsDto(id, score, questions.size());
+    }
 
-        return QuizResultsDto(id,score,total);
+    public List<QuizResultsDto> getQuizResultsForStudent(String studentId) {
+        return quizResultsRepository.findByStudentId(studentId)
+                .stream()
+                .map(result -> new QuizResultsDto(
+                        result.getQuizId(),
+                        result.getMarksObtained(),
+                        result.getTotalMarks()
+                ))
+                .toList();
     }
 }
