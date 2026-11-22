@@ -33,12 +33,6 @@ public class FaceVerificationController {
     @PostMapping("/api/verify-face")
     public ResponseEntity<FaceVerificationResponse> verifyFace(@ModelAttribute FaceVerificationRequest req) throws IOException, Exception {
 
-        System.out.println("========== FACE VERIFICATION REQUEST ==========");
-        System.out.println("Image received: " + (req.getImage() != null));
-        System.out.println("Image size: "
-                + (req.getImage() != null ? req.getImage().getSize() : 0));
-        System.out.println("Image URL: " + req.getImgUrl());
-
         MultipartFile image = req.getImage();
 
         byte[] bytes = image.getBytes();

@@ -13,9 +13,7 @@
     <!-- Navigation -->
     <nav class="navbar">
 
-
-        <h1 class="brand"> Vision.
-        </h1>
+        <h1 class="brand">Vision.</h1>
 
         <div class="navbar-actions">
 
@@ -45,9 +43,19 @@
             </div>
 
             <div class="welcome-actions">
-                <a href="/upload-quiz" class="upload-btn">
-                    + Upload New Quiz
-                </a>
+
+                <!-- Create Quiz Form -->
+                <form action="/admin/create-quiz" method="post" class="upload-quiz-form">
+
+                    <input type="number" name="numberOfQuestions" placeholder="No. of Questions" min="1" max="20"
+                        required>
+
+                    <button type="submit" class="upload-btn">
+                        + Create New Quiz
+                    </button>
+
+                </form>
+
             </div>
 
         </header>
@@ -80,12 +88,6 @@
                         <h3 class="quiz-title" th:text="'Quiz #' + ${quiz.id}">
                             Quiz #1
                         </h3>
-
-                        <span class="status"
-                            th:classappend="${quiz.expiresAt != null and quiz.expiresAt.isAfter(T(java.time.Instant).now())} ? ' status-active' : ' status-expired'"
-                            th:text="${quiz.expiresAt != null and quiz.expiresAt.isAfter(T(java.time.Instant).now())} ? 'Active' : 'Expired'">
-                            Active
-                        </span>
 
                     </header>
 
@@ -182,9 +184,6 @@
         </section>
 
     </main>
-
-
-
 
 </body>
 

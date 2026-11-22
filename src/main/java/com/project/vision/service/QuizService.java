@@ -32,7 +32,8 @@ public class QuizService {
     private final AdminRepo adminRepo;
     private final StudentRepo studentRepo;
     private final QuizResultsRepository quizResultsRepository;
-    int size = 2;
+    private static final int MIN_QUESTIONS = 1;
+    private static final int MAX_QUESTIONS = 20;
 
     public QuizService(QuizRepository quizRepository, AdminRepo adminRepo, StudentRepo studentRepo,
             QuizResultsRepository quizResultsRepository) {
@@ -82,8 +83,10 @@ public class QuizService {
             throw new IllegalArgumentException("A valid duration is required.");
         }
         List<QuizQuestionDto> questions = quizDto.getQuestions();
-        if (questions == null || questions.size() != size) {
-            throw new IllegalArgumentException("Exactly " + size + " questions are required.");
+        if (questions == null || questions.size() < MIN_QUESTIONS
+                || questions.size() > MAX_QUESTIONS) {
+            throw new IllegalArgumentException(
+                    "Quiz must contain between " + MIN_QUESTIONS + " and " + MAX_QUESTIONS + " questions.");
         }
 
         for (QuizQuestionDto question : questions) {
@@ -196,5 +199,20 @@ public class QuizService {
                         result.getTotalMarks()
                 ))
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public QuizResultsDto getQuizResultForStudent(
+            String studentId,
+            String quizId) {
+
+        return quizResultsRepository
+                .findByStudentIdAndQuizId(studentId, quizId)
+                .map(result -> new QuizResultsDto(
+                        result.getQuizId(),
+                        result.getMarksObtained(),
+                        result.getTotalMarks()
+                ))
+                .orElse(null);
     }
 }

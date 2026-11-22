@@ -4,83 +4,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Quiz</title>
+    <title>Upload Quiz | Vision</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
-    <h1>Upload Quiz</h1>
 
-    <form method="post" action="/upload-quiz">
+    <main class="container">
 
-        <label for="durationMinutes">Quiz Validity Duration:</label>
+        <h1>Upload Quiz</h1>
 
-        <select id="durationMinutes" name="durationMinutes" required>
-            <option value="">Select Duration</option>
-            <option value="30">30 Minutes</option>
-            <option value="60">1 Hour</option>
-            <option value="180">3 Hours</option>
-            <option value="360">6 Hours</option>
-            <option value="720">12 Hours</option>
-            <option value="1440">1 Day</option>
-        </select>
+        <form method="post" action="/upload-quiz">
 
-        <br><br>
-
-        <div th:each="index : ${#numbers.sequence(0, 1)}" class="question-box">
-
-
-            <label th:for="'question_' + ${index}">
-                Question no. <span th:text="${index + 1}">1</span>:
+            <!-- Quiz Duration -->
+            <label for="durationMinutes">
+                Quiz Validity Duration:
             </label>
 
-            <input type="text" th:id="'question_' + ${index}" th:name="'questions[' + ${index} + '].question'" required>
+            <select id="durationMinutes" name="durationMinutes" required>
 
-            <br><br>
+                <option value="">Select Duration</option>
+                <option value="30">30 Minutes</option>
+                <option value="60">1 Hour</option>
+                <option value="180">3 Hours</option>
+                <option value="360">6 Hours</option>
+                <option value="720">12 Hours</option>
+                <option value="1440">1 Day</option>
 
-            <label th:for="'option_a_' + ${index}">Option A:</label>
-            <input type="text" th:id="'option_a_' + ${index}" th:name="'questions[' + ${index} + '].options[0]'"
-                required>
-
-            <br><br>
-
-            <label th:for="'option_b_' + ${index}">Option B:</label>
-            <input type="text" th:id="'option_b_' + ${index}" th:name="'questions[' + ${index} + '].options[1]'"
-                required>
-
-            <br><br>
-
-            <label th:for="'option_c_' + ${index}">Option C:</label>
-            <input type="text" th:id="'option_c_' + ${index}" th:name="'questions[' + ${index} + '].options[2]'"
-                required>
-
-            <br><br>
-
-            <label th:for="'option_d_' + ${index}">Option D:</label>
-            <input type="text" th:id="'option_d_' + ${index}" th:name="'questions[' + ${index} + '].options[3]'"
-                required>
-
-            <br><br>
-
-            <label th:for="'answer_' + ${index}">
-                Correct Answer:
-            </label>
-
-            <select th:id="'answer_' + ${index}" th:name="'questions[' + ${index} + '].answer'" required>
-                <option value="">Select Correct Option</option>
-                <option value="0">Option A</option>
-                <option value="1">Option B</option>
-                <option value="2">Option C</option>
-                <option value="3">Option D</option>
             </select>
 
-            <hr>
+            <br><br>
 
-        </div>
 
-        <button type="submit">Upload Quiz</button>
+            <!-- Generate Questions Dynamically -->
+            <div th:if="${numberOfQuestions != null}" th:each="index : ${#numbers.sequence(0, numberOfQuestions - 1)}"
+                class="question-box">
 
-    </form>
+                <h2>
+                    Question
+                    <span th:text="${index + 1}">1</span>
+                </h2>
+
+
+                <!-- Question -->
+                <label th:for="'question_' + ${index}">
+                    Question:
+                </label>
+
+                <input type="text" th:id="'question_' + ${index}" th:name="'questions[' + ${index} + '].question'"
+                    required>
+
+                <br><br>
+
+
+                <!-- Option A -->
+                <label th:for="'option_a_' + ${index}">
+                    Option A:
+                </label>
+
+                <input type="text" th:id="'option_a_' + ${index}" th:name="'questions[' + ${index} + '].options[0]'"
+                    required>
+
+                <br><br>
+
+
+                <!-- Option B -->
+                <label th:for="'option_b_' + ${index}">
+                    Option B:
+                </label>
+
+                <input type="text" th:id="'option_b_' + ${index}" th:name="'questions[' + ${index} + '].options[1]'"
+                    required>
+
+                <br><br>
+
+
+                <!-- Option C -->
+                <label th:for="'option_c_' + ${index}">
+                    Option C:
+                </label>
+
+                <input type="text" th:id="'option_c_' + ${index}" th:name="'questions[' + ${index} + '].options[2]'"
+                    required>
+
+                <br><br>
+
+
+                <!-- Option D -->
+                <label th:for="'option_d_' + ${index}">
+                    Option D:
+                </label>
+
+                <input type="text" th:id="'option_d_' + ${index}" th:name="'questions[' + ${index} + '].options[3]'"
+                    required>
+
+                <br><br>
+
+
+                <!-- Correct Answer -->
+                <label th:for="'answer_' + ${index}">
+                    Correct Answer:
+                </label>
+
+                <select th:id="'answer_' + ${index}" th:name="'questions[' + ${index} + '].answer'" required>
+
+                    <option value="">Select Correct Option</option>
+                    <option value="0">Option A</option>
+                    <option value="1">Option B</option>
+                    <option value="2">Option C</option>
+                    <option value="3">Option D</option>
+
+                </select>
+
+                <hr>
+
+            </div>
+
+
+            <!-- Upload Button -->
+            <button type="submit">
+                Upload Quiz
+            </button>
+
+        </form>
+
+    </main>
+
 </body>
 
 </html>

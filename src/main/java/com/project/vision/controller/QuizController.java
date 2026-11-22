@@ -10,10 +10,11 @@ import com.project.vision.service.QuizService;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -32,17 +33,30 @@ public class QuizController {
     }
 
     @GetMapping("/upload-quiz")
-    public String quizPage() {
+    public String quizPage(
+            @RequestParam(required = false) Integer questions,
+            org.springframework.ui.Model model) {
+
+        if (questions != null && (questions < 1 || questions > 20)) {
+            return "redirect:/";
+        }
+
+        model.addAttribute("numberOfQuestions", questions);
+
         return "quiz";
     }
 
-    @PostMapping("/upload-quiz")
-    public String uploadQuiz(
-            @ModelAttribute QuizDto quizDto,
+    @PostMapping("/admin/create-quiz")
+    public String createQuiz(
+            @RequestParam int numberOfQuestions,
             Authentication authentication) {
 
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/admin/login";
+        }
+
+        if (numberOfQuestions < 1 || numberOfQuestions > 20) {
+            return "redirect:/?error=invalidQuestions";
         }
 
         String username = authentication.getName();
@@ -55,12 +69,28 @@ public class QuizController {
             return "redirect:/admin/profile?verificationRequired";
         }
 
-        try {
-            quizService.saveQuiz(quizDto);
-            return "redirect:/";
-        } catch (RuntimeException exception) {
-            return "redirect:/upload-quiz?error";
+        return "redirect:/upload-quiz?questions=" + numberOfQuestions;
+    }
+
+    @PostMapping("/upload-quiz")
+    public String uploadQuiz(
+            @ModelAttribute QuizDto quizDto,
+            Authentication authentication) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "redirect:/admin/login";
         }
+
+        Admin admin = adminRepo.findByEmailIgnoreCase(authentication.getName())
+                .or(() -> adminRepo.findByName(authentication.getName()))
+                .orElse(null);
+
+        if (admin == null || !Boolean.TRUE.equals(admin.getIsVerified())) {
+            return "redirect:/admin/profile?verificationRequired";
+        }
+
+        quizService.saveQuiz(quizDto);
+        return "redirect:/";
     }
 
     @PostMapping("/api/quiz")
@@ -80,13 +110,11 @@ public class QuizController {
     public QuizResultsDto submitQuiz(@RequestHeader("id") String id, @RequestBody Map<String, String> answers,
             Authentication authentication) {
 
-
         // upload quiz to database
         System.out.println("Fetching quiz with ID: " + id);
 
         return quizService.validateAnswers(id, authentication.getName(), answers);
     }
-
 
     @PostMapping("/api/quiz-results")
     @ResponseBody
@@ -97,10 +125,20 @@ public class QuizController {
 
     @PostMapping("/api/quiz-result")
     @ResponseBody
-    public QuizResultsDto fetchStudentQuizResult(Authentication authentication) {
+    public QuizResultsDto fetchStudentQuizResult(
+            Authentication authentication,
+            @RequestBody Map<String, String> request) {
 
-        return quizService.getQuizResultsForStudent(authentication.getName()).stream().findFirst().orElse(null);
+        String quizId = request.get("quizId");
+
+        if (quizId == null || quizId.isBlank()) {
+            throw new IllegalArgumentException("Quiz ID is required.");
+        }
+
+        return quizService.getQuizResultForStudent(
+                authentication.getName(),
+                quizId
+        );
     }
-
 
 }
