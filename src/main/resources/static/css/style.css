@@ -315,6 +315,13 @@ hr {
     font-weight: 700;
 }
 
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+}
+
 /* ---------- Cards and surfaces ---------- */
 
 .card,
@@ -434,7 +441,7 @@ button:disabled {
 .delete-btn:hover {
     border-color: var(--destructive);
     background: var(--destructive);
-    color: #ffffff;
+    color: var(--card);
 }
 
 .btn-success {
@@ -565,54 +572,6 @@ select {
     margin-top: 0.5rem;
 }
 
-/* ---------- Authentication pages ---------- */
-/* These selectors style the current simple login/signup pages without
-   requiring a class on the body. More specific page classes can override. */
-
-body:has(> form[action="/admin/login"]),
-body:has(> form[action="/admin/register"]),
-body:has(> form[action="/github/register"]) {
-    display: flex;
-    min-height: 100vh;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 1rem;
-}
-
-body:has(> form[action="/admin/login"]) > form,
-body:has(> form[action="/admin/register"]) > form,
-body:has(> form[action="/github/register"]) > form {
-    width: min(100%, 420px);
-    gap: 1rem;
-    padding: clamp(1.5rem, 4vw, 2.5rem);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    background: var(--card);
-    box-shadow: var(--shadow-lg);
-}
-
-body:has(> form[action="/admin/login"]) > p,
-body:has(> form[action="/admin/register"]) > p,
-body:has(> form[action="/github/register"]) > p {
-    width: min(100%, 420px);
-    margin: 0.7rem 0 0;
-    text-align: center;
-}
-
-body:has(> form[action="/admin/login"]) > p a,
-body:has(> form[action="/admin/register"]) > p a,
-body:has(> form[action="/github/register"]) > p a {
-    color: var(--foreground);
-    font-weight: 600;
-}
-
-body:has(> form[action="/admin/login"]) > p a:hover,
-body:has(> form[action="/admin/register"]) > p a:hover,
-body:has(> form[action="/github/register"]) > p a:hover {
-    color: var(--info);
-}
-
 /* ---------- Alerts and status messages ---------- */
 
 .alert,
@@ -678,9 +637,37 @@ body:has(> form[action="/github/register"]) > p a:hover {
 /* ---------- Dashboard ---------- */
 
 .container {
+    width: min(calc(100% - 48px), var(--page-width));
     max-width: var(--page-width);
     margin: 2.5rem auto;
-    padding-inline: 24px;
+    padding-inline: 0;
+}
+
+.quiz-page.container {
+    max-width: 900px;
+    margin-block: clamp(1.75rem, 5vw, 3.5rem);
+}
+
+.quiz-page > .page-header {
+    margin-bottom: 1.25rem;
+}
+
+.quiz-page > .page-header h1 {
+    margin: 0;
+}
+
+.quiz-form {
+    gap: 1.25rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    background: var(--card);
+    box-shadow: var(--shadow-md);
+}
+
+.quiz-form .form-group {
+    display: flex;
+    flex-direction: column;
 }
 
 .welcome-section {
@@ -691,8 +678,25 @@ body:has(> form[action="/github/register"]) > p a:hover {
     margin-bottom: 2.25rem;
 }
 
+.upload-quiz-form {
+    width: min(100%, 390px);
+    flex-direction: row;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.upload-quiz-form input {
+    min-width: 0;
+    flex: 1 1 150px;
+}
+
+.upload-quiz-form .upload-btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
 .welcome-section h1 {
-    margin-bottom: 0.45rem;
+    margin-bottom: 0;
 }
 
 .welcome-section p {
@@ -731,13 +735,26 @@ body:has(> form[action="/github/register"]) > p a:hover {
     margin-bottom: 1.1rem;
 }
 
+.quiz-section > .section-header {
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid var(--border);
+}
+
 .section-header h2 {
     margin-bottom: 0;
 }
 
 .quiz-count {
+    display: inline-flex;
+    min-height: 27px;
+    align-items: center;
+    padding: 0.25rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--card);
     color: var(--muted-foreground);
     font-size: 0.82rem;
+    font-weight: 600;
 }
 
 .quiz-grid {
@@ -813,194 +830,13 @@ body:has(> form[action="/github/register"]) > p a:hover {
     text-align: center;
 }
 
-/* ---------- Admin profile ---------- */
-
-body:has(> h1) > h1 {
-    width: min(calc(100% - 40px), 760px);
-    margin: 3rem auto 1.25rem;
-}
-
-body:has(> h1) > div {
-    width: min(calc(100% - 40px), 760px);
-    margin: 0 auto 1rem;
-    padding: 1.35rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    background: var(--card);
-    box-shadow: var(--shadow-sm);
-}
-
-body:has(> h1) > div p:last-child {
-    margin-bottom: 0;
-}
-
-body:has(> h1) > div a {
-    color: var(--foreground);
-    font-weight: 600;
-}
-
-body:has(> h1) > div a:hover {
-    color: var(--info);
-}
-
-/* ---------- Email verification result ---------- */
-
-body:has(h1[th\\:if="\\$\\{verified\\}"]) {
-    display: flex;
-    min-height: 100vh;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    text-align: center;
-}
-
-body:has(h1[th\\:if="\\$\\{verified\\}"]) h1,
-body:has(h1[th\\:if="\\$\\{verified\\}"]) p,
-body:has(h1[th\\:if="\\$\\{verified\\}"]) a {
-    width: min(100%, 520px);
-}
-
-body:has(h1[th\\:if="\\$\\{verified\\}"]) a {
-    display: inline-flex;
-    width: auto;
-    min-height: 40px;
-    align-items: center;
-    justify-content: center;
-    margin-top: 0.75rem;
-    padding: 0.65rem 1rem;
-    border-radius: var(--radius-md);
-    background: var(--primary);
-    color: var(--primary-foreground);
-    font-weight: 600;
-}
-
-/* ---------- Quiz upload page ---------- */
-
-body:has(form[action="/upload-quiz"]) {
-    padding-bottom: 3rem;
-}
-
-body:has(form[action="/upload-quiz"]) > h1 {
-    width: min(calc(100% - 40px), 850px);
-    margin: 2.5rem auto 1.25rem;
-}
-
-body:has(form[action="/upload-quiz"]) > form {
-    width: min(calc(100% - 40px), 850px);
-    margin-inline: auto;
-    padding: clamp(1.25rem, 3vw, 2rem);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    background: var(--card);
-    box-shadow: var(--shadow-md);
-}
-
-body:has(form[action="/upload-quiz"]) .question-box {
-    display: flex;
-    flex-direction: column;
-    gap: 0.55rem;
-    padding: 1.25rem;
-    box-shadow: none;
-}
-
-.question-box label {
-    margin-top: 0.2rem;
-}
-
-.question-box hr {
-    width: 100%;
-}
-
-body:has(form[action="/upload-quiz"]) > form > button {
-    align-self: flex-start;
-}
-
-/* ---------- Student registration and camera ---------- */
-
-body:has(#registerForm) {
-    padding: 2.5rem 0 4rem;
-}
-
-body:has(#registerForm) h1 {
-    width: min(calc(100% - 40px), 760px);
-    margin: 0 auto 1.25rem;
-}
-
-#registerForm {
-    width: min(calc(100% - 40px), 760px);
-    margin-inline: auto;
-    padding: clamp(1.25rem, 3vw, 2rem);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    background: var(--card);
-    box-shadow: var(--shadow-md);
-}
-
-#registerForm h3 {
-    margin: 0.5rem 0 0;
-}
-
-#camera {
-    width: min(100%, 480px);
-    max-height: 420px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    background: #090a0c;
-    object-fit: cover;
-}
-
-#canvas {
-    display: none;
-}
-
-#preview {
-    width: min(100%, 260px);
-    max-height: 320px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    background: var(--muted);
-    object-fit: contain;
-}
-
-#openCamera,
-#capturePhoto {
-    align-self: flex-start;
-}
-
-#capturePhoto:disabled {
-    opacity: 0.45;
-}
-
-/* ---------- GitHub signup completion ---------- */
-
-body:has(form[action="/github/register"]) > h1 {
-    width: min(calc(100% - 40px), 480px);
-    margin: 0 auto 1.25rem;
-}
-
-body:has(form[action="/github/register"]) > p {
-    width: min(calc(100% - 40px), 480px);
-    margin: 0 auto 1rem;
-}
-
-body:has(form[action="/github/register"]) > form {
-    width: min(calc(100% - 40px), 480px);
-    margin-inline: auto;
-}
-
-body:has(form[action="/github/register"]) > form label {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-}
-
 /* ---------- Current template layouts ---------- */
 
 .auth-page,
 .verification-page {
     display: flex;
     min-height: 100vh;
+    min-height: 100svh;
     align-items: center;
     justify-content: center;
     padding: 2rem 1rem;
@@ -1020,6 +856,16 @@ body:has(form[action="/github/register"]) > form label {
 .verification-header {
     margin-bottom: 1.5rem;
     text-align: center;
+}
+
+.auth-header::after {
+    display: block;
+    width: 42px;
+    height: 3px;
+    margin: 1.25rem auto 0;
+    border-radius: 999px;
+    background: var(--info);
+    content: "";
 }
 
 .auth-header h1,
@@ -1042,6 +888,11 @@ body:has(form[action="/github/register"]) > form label {
 .auth-form .form-group {
     display: flex;
     flex-direction: column;
+}
+
+.auth-form .form-group label,
+.register-form .form-group label {
+    margin-bottom: 0.45rem;
 }
 
 .auth-form > button,
@@ -1069,6 +920,17 @@ body:has(form[action="/github/register"]) > form label {
     font-weight: 600;
 }
 
+.auth-alternative a {
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--info) 35%, transparent);
+    text-underline-offset: 0.2em;
+}
+
+.auth-alternative a:hover,
+.auth-footer a:hover {
+    color: var(--primary);
+}
+
 .auth-footer {
     margin-top: 1.5rem;
     padding-top: 1rem;
@@ -1083,6 +945,10 @@ body:has(form[action="/github/register"]) > form label {
 .auth-messages:empty,
 .auth-messages p:empty {
     display: none;
+}
+
+.auth-messages:has(> p) {
+    margin-bottom: 1rem;
 }
 
 .auth-messages p,
@@ -1113,6 +979,17 @@ body:has(form[action="/github/register"]) > form label {
 }
 
 .profile-page > .page-header h1 {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.profile-card-header {
+    margin-bottom: 1.1rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.profile-card-header h2 {
     margin: 0;
 }
 
@@ -1145,6 +1022,10 @@ body:has(form[action="/github/register"]) > form label {
     font-weight: 600;
 }
 
+.verification-status .status {
+    margin: 0;
+}
+
 .verification-section {
     margin-top: 1.25rem;
     padding-top: 1.1rem;
@@ -1163,6 +1044,7 @@ body:has(form[action="/github/register"]) > form label {
 
 .verification-message {
     padding: 0.7rem 0.85rem;
+    border: 1px solid color-mix(in srgb, var(--success) 24%, var(--border));
     border-radius: var(--radius-md);
     background: color-mix(in srgb, var(--success) 8%, var(--card));
     color: var(--success);
@@ -1191,10 +1073,34 @@ body:has(form[action="/github/register"]) > form label {
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     background: var(--muted);
+    transition: border-color var(--transition), background var(--transition),
+                color var(--transition), transform var(--transition);
+}
+
+.profile-actions a:hover {
+    border-color: var(--ring);
+    background: var(--accent);
+    color: var(--accent-foreground);
+}
+
+.profile-actions .logout-link {
+    border-color: color-mix(in srgb, var(--destructive) 28%, var(--border));
+    background: color-mix(in srgb, var(--destructive) 7%, var(--card));
+    color: var(--destructive);
+}
+
+.profile-actions .logout-link:hover {
+    border-color: var(--destructive);
+    background: var(--destructive);
+    color: var(--card);
 }
 
 .profile-footer {
     margin-top: 1.25rem;
+}
+
+.profile-page > footer.profile-actions {
+    margin-top: 1.5rem;
 }
 
 .verification-page {
@@ -1219,32 +1125,43 @@ body:has(form[action="/github/register"]) > form label {
     background: var(--primary);
     color: var(--primary-foreground);
     font-weight: 600;
+    transition: background var(--transition), transform var(--transition);
 }
 
-/* Quiz upload */
-
-body:has(form[action="/upload-quiz"]) > h1 {
-    width: min(calc(100% - 32px), 850px);
-    margin: 2.5rem auto 1.25rem;
-}
-
-body:has(form[action="/upload-quiz"]) > form {
-    width: min(calc(100% - 32px), 850px);
-    margin-inline: auto;
+.verification-navigation a:hover {
+    background: var(--primary-hover);
+    color: var(--primary-foreground);
 }
 
 .question-box {
+    display: grid;
+    gap: 0.45rem;
     min-width: 0;
+    padding: clamp(1rem, 2.5vw, 1.35rem);
+    box-shadow: none;
 }
 
-.question-box br {
-    display: none;
+.question-box h2 {
+    margin: 0 0 0.35rem;
+}
+
+.question-box label {
+    margin: 0;
+}
+
+.question-box hr {
+    margin: 0.7rem 0 0;
+}
+
+.quiz-form > button {
+    align-self: flex-start;
 }
 
 /* Student registration and camera preview */
 
 .register-page {
     min-height: 100vh;
+    min-height: 100svh;
     padding: 2.5rem 0 4rem;
 }
 
@@ -1359,6 +1276,10 @@ body:has(form[action="/upload-quiz"]) > form {
     .camera-actions button {
         flex: 1 1 140px;
     }
+
+    .quiz-form > button {
+        align-self: stretch;
+    }
 }
 
 /* ---------- Utility classes for future page redesigns ---------- */
@@ -1469,6 +1390,18 @@ body:has(form[action="/upload-quiz"]) > form {
     .section-header {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .upload-quiz-form {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .upload-quiz-form input,
+    .upload-quiz-form .upload-btn {
+        width: 100%;
+        flex: auto;
     }
 
     .form-actions {

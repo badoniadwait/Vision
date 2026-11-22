@@ -10,30 +10,32 @@
 
 <body>
 
-    <main class="container">
+    <main class="container quiz-page">
 
-        <h1>Upload Quiz</h1>
+        <header class="page-header">
+            <h1>Upload Quiz</h1>
+        </header>
 
-        <form method="post" action="/upload-quiz">
+        <form method="post" action="/upload-quiz" class="quiz-form">
 
             <!-- Quiz Duration -->
-            <label for="durationMinutes">
-                Quiz Validity Duration:
-            </label>
+            <div class="form-group">
+                <label for="durationMinutes">
+                    Quiz Validity Duration:
+                </label>
 
-            <select id="durationMinutes" name="durationMinutes" required>
+                <select id="durationMinutes" name="durationMinutes" required>
 
-                <option value="">Select Duration</option>
-                <option value="30">30 Minutes</option>
-                <option value="60">1 Hour</option>
-                <option value="180">3 Hours</option>
-                <option value="360">6 Hours</option>
-                <option value="720">12 Hours</option>
-                <option value="1440">1 Day</option>
+                    <option value="">Select Duration</option>
+                    <option value="30">30 Minutes</option>
+                    <option value="60">1 Hour</option>
+                    <option value="180">3 Hours</option>
+                    <option value="360">6 Hours</option>
+                    <option value="720">12 Hours</option>
+                    <option value="1440">1 Day</option>
 
-            </select>
-
-            <br><br>
+                </select>
+            </div>
 
 
             <!-- Generate Questions Dynamically -->
@@ -54,9 +56,6 @@
                 <input type="text" th:id="'question_' + ${index}" th:name="'questions[' + ${index} + '].question'"
                     required>
 
-                <br><br>
-
-
                 <!-- Option A -->
                 <label th:for="'option_a_' + ${index}">
                     Option A:
@@ -64,9 +63,6 @@
 
                 <input type="text" th:id="'option_a_' + ${index}" th:name="'questions[' + ${index} + '].options[0]'"
                     required>
-
-                <br><br>
-
 
                 <!-- Option B -->
                 <label th:for="'option_b_' + ${index}">
@@ -76,9 +72,6 @@
                 <input type="text" th:id="'option_b_' + ${index}" th:name="'questions[' + ${index} + '].options[1]'"
                     required>
 
-                <br><br>
-
-
                 <!-- Option C -->
                 <label th:for="'option_c_' + ${index}">
                     Option C:
@@ -87,9 +80,6 @@
                 <input type="text" th:id="'option_c_' + ${index}" th:name="'questions[' + ${index} + '].options[2]'"
                     required>
 
-                <br><br>
-
-
                 <!-- Option D -->
                 <label th:for="'option_d_' + ${index}">
                     Option D:
@@ -97,9 +87,6 @@
 
                 <input type="text" th:id="'option_d_' + ${index}" th:name="'questions[' + ${index} + '].options[3]'"
                     required>
-
-                <br><br>
-
 
                 <!-- Correct Answer -->
                 <label th:for="'answer_' + ${index}">

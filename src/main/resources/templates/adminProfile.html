@@ -50,7 +50,7 @@
                     <!-- Verified -->
                     <div class="verification-status" th:if="${admin.isVerified}">
 
-                        <p>Email verified</p>
+                        <p class="status status-active">Email verified</p>
 
                     </div>
 
@@ -58,7 +58,7 @@
                     <!-- Not Verified -->
                     <div class="verification-status" th:unless="${admin.isVerified}">
 
-                        <p>Email not verified</p>
+                        <p class="status status-expired">Email not verified</p>
 
                         <form method="post" action="/admin/verify-email" class="verification-form">
 
@@ -113,12 +113,10 @@
 
         </section>
 
-        <br>
-
         <!-- Account Session -->
         <footer class="profile-actions">
 
-            <a style="color: red; background-color: white;" href="/logout">
+            <a class="logout-link" href="/logout">
                 Logout
             </a>
 
